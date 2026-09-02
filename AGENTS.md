@@ -129,7 +129,8 @@ graphify-mcp-test/
 │   └── ...
 │
 ├── graph/
-│   └── graph.json
+│   ├── graph.json
+│   └── graph.html
 │
 ├── mcp/
 │   └── configuration files
@@ -268,16 +269,24 @@ The expected output is:
 
 ```text
 graph/
-└── graph.json
+├── graph.json
+└── graph.html
 ```
+
+`graph.json` is the machine-readable graph used by the MCP server and AI agents.
+
+`graph.html` is a browser-based interactive graph viewer for humans. It must be regenerated whenever the graph is rebuilt so people can open it locally in a browser (no server required) to explore nodes and relationships visually.
 
 Before continuing, verify:
 
 ```text
 graph.json exists
+graph.html exists
 ```
 
 Also verify that the graph contains nodes and relationships related to the sample application.
+
+Open `graph/graph.html` in a browser to confirm the interactive viewer loads.
 
 ---
 
@@ -553,6 +562,8 @@ Run Update Script
 Graphify Rebuilds Graph
        ↓
 graph.json Updated
+       ↓
+graph.html Updated (interactive viewer)
 ```
 
 Create a script similar to:
@@ -566,8 +577,9 @@ The script should:
 1. Detect the project root.
 2. Run Graphify.
 3. Generate or update `graph.json`.
-4. Validate that the output exists.
-5. Print a useful success/failure message.
+4. Generate or update `graph.html` (browser-based interactive viewer for humans).
+5. Validate that both outputs exist.
+6. Print a useful success/failure message.
 
 Do not silently ignore failures.
 
@@ -631,14 +643,17 @@ Preferred conceptual pattern:
 Host
 │
 └── graph/
-      └── graph.json
+      ├── graph.json   ← mounted into MCP container
+      └── graph.html   ← open locally in a browser (human viewer)
             │
             ▼
-Docker Volume Mount
+Docker Volume Mount (graph.json)
             │
             ▼
 Graphify MCP Container
 ```
+
+Mount `graph.json` for the MCP server. Keep `graph.html` available on the host so humans can open the interactive viewer in a browser without a server.
 
 Use read-only mounting where possible.
 
@@ -654,6 +669,7 @@ The following must be tested:
 [ ] Sample application exists
 [ ] Graph generation succeeds
 [ ] graph.json exists
+[ ] graph.html exists and opens in a browser
 [ ] MCP server starts
 [ ] MCP client can connect
 [ ] Graphify tools are visible
@@ -687,6 +703,7 @@ For graph generation:
 [INFO] Generating graph
 [INFO] Source: sample-app/
 [INFO] Output: graph/graph.json
+[INFO] Viewer: graph/graph.html
 [INFO] Graph generated successfully
 ```
 
@@ -711,7 +728,7 @@ Source Code
     ↓
 Graphify
     ↓
-graph.json
+graph.json  (+ graph.html for human browser viewing)
     ↓
 MCP Server
     ↓
@@ -823,7 +840,9 @@ Developer changes source code
             ↓
 Runs graph update command
             ↓
-graph.json is regenerated
+graph.json and graph.html are regenerated
+            ↓
+Humans can open graph.html in a browser
             ↓
 Graphify MCP loads the graph
             ↓
