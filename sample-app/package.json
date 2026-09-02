@@ -1,0 +1,14 @@
+{
+  "name": "sample-app",
+  "version": "1.0.0",
+  "description": "Small sample application for Graphify MCP local testing (Auth + Payment)",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "npx --yes tsx src/index.ts"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
