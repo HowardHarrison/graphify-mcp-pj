@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "graphify-local": {
+      "type": "stdio",
+      "command": "${userHome}/.local/bin/graphify-mcp.exe",
+      "args": [
+        "${workspaceFolder}/graph/graph.json",
+        "--transport",
+        "stdio"
+      ]
+    }
+  }
+}

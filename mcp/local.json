@@ -1,8 +1,14 @@
 {
   "name": "graphify-local",
-  "description": "Local Graphify MCP server for sample-app code graph (Phase 3).",
+  "description": "Local Graphify MCP server for sample-app code graph.",
+  "cursor": {
+    "config": ".cursor/mcp.json",
+    "server_id": "graphify-local",
+    "transport": "stdio"
+  },
   "transport": {
-    "preferred": "http",
+    "preferred_for_cursor": "stdio",
+    "preferred_for_manual_verify": "http",
     "stdio_command": "graphify-mcp",
     "http": {
       "host": "127.0.0.1",
@@ -17,7 +23,7 @@
   },
   "notes": [
     "Do not expose this server publicly.",
-    "Cursor wiring is Phase 4; this file documents local Phase 3 defaults.",
+    "Cursor uses .cursor/mcp.json (stdio). HTTP scripts remain for local verification.",
     "Regenerate the graph with scripts/generate-graph.ps1 before serving."
   ]
 }
