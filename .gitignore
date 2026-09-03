@@ -8,3 +8,12 @@ __pycache__/
 graph/cache/
 *.log
 .DS_Store
+mcp/.env
+mcp/.mcp.pid
+mcp/.mcp.out.log
+mcp/.mcp.err.log
+mcp/.verify/
+mcp/_*.json
+mcp/_*.body
+mcp/_*.headers
+mcp/_*.log
