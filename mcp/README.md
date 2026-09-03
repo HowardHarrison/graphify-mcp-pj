@@ -179,6 +179,17 @@ Expected verification highlights:
 * `tools/list` exposes 10 tools (`query_graph`, `get_node`, `get_neighbors`, `get_community`, `god_nodes`, `graph_stats`, `shortest_path`, `list_prs`, `get_pr_impact`, `triage_prs`)
 * `graph_stats` reports nodes/edges from `graph/graph.json`
 
+## Phase 5 architecture query tests
+
+Narrative results: [`PHASE5_TEST_REPORT.md`](PHASE5_TEST_REPORT.md)
+
+Repeatable HTTP checks (server must already be running):
+
+```powershell
+powershell -File scripts/start-mcp.ps1
+powershell -File scripts/test-mcp-queries.ps1
+```
+
 ## Security
 
 - Bind to `127.0.0.1` only

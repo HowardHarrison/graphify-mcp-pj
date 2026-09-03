@@ -1,0 +1,3 @@
+event: message
+data: {"jsonrpc":"2.0","id":12,"result":{"content":[{"text":"Neighbors of PaymentService:\n  --> .constructor() [method] [EXTRACTED] at=src/payment/payment.service.ts:L23\n  --> .processPayment() [method] [EXTRACTED] at=src/payment/payment.service.ts:L33\n  --> .getPayment() [method] [EXTRACTED] at=src/payment/payment.service.ts:L64\n  <-- index.ts [imports] [EXTRACTED] at=src/index.ts:L10\n  <-- payment.controller.ts [imports] [EXTRACTED] at=src/payment/payment.controller.ts:L4\n  <-- .constructor() [references] [EXTRACTED] at=src/payment/payment.controller.ts:L12\n  <-- payment.service.ts [contains] [EXTRACTED] at=src/payment/payment.service.ts:L22","type":"text"}],"isError":false}}
+
