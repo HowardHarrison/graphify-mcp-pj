@@ -2,11 +2,10 @@
   "mcpServers": {
     "graphify-local": {
       "type": "stdio",
-      "command": "${userHome}/.local/bin/graphify-mcp.exe",
+      "command": "cmd.exe",
       "args": [
-        "${workspaceFolder}/graph/graph.json",
-        "--transport",
-        "stdio"
+        "/c",
+        "${workspaceFolder}\\scripts\\run-graphify-mcp-stdio.cmd"
       ]
     }
   }

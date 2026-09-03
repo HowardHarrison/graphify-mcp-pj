@@ -44,9 +44,17 @@ if ($HostBind -ne "127.0.0.1" -and $HostBind -ne "localhost") {
     exit 1
 }
 
-if (-not (Get-Command graphify-mcp -ErrorAction SilentlyContinue)) {
-    Write-Host "[ERROR] graphify-mcp not found. Install with: uv tool install `"graphifyy[mcp]`""
-    exit 1
+$graphifyCmd = Get-Command graphify-mcp -ErrorAction SilentlyContinue
+if (-not $graphifyCmd) {
+    $fallback = Join-Path $env:USERPROFILE ".local\bin\graphify-mcp.exe"
+    if (Test-Path $fallback) {
+        $graphifyExe = $fallback
+    } else {
+        Write-Host "[ERROR] graphify-mcp not found. Install with: uv tool install `"graphifyy[mcp]`""
+        exit 1
+    }
+} else {
+    $graphifyExe = $graphifyCmd.Source
 }
 
 if (-not (Test-Path $GraphPath)) {
@@ -66,6 +74,7 @@ if ($existingListener) {
 Write-Host "[INFO] Starting Graphify MCP server"
 Write-Host "[INFO] Loading graph"
 Write-Host "[INFO] Graph: $GraphPath"
+Write-Host "[INFO] Executable: $graphifyExe"
 Write-Host "[INFO] Bind: ${HostBind}:${Port}"
 
 $argList = @(
@@ -77,7 +86,7 @@ $argList = @(
 
 Remove-Item -Force $OutLog, $ErrLog -ErrorAction SilentlyContinue
 
-$proc = Start-Process -FilePath "graphify-mcp" `
+$proc = Start-Process -FilePath $graphifyExe `
     -ArgumentList $argList `
     -WorkingDirectory $Root `
     -RedirectStandardOutput $OutLog `
@@ -99,6 +108,7 @@ if (-not $listenerPid) {
     if (Test-Path $OutLog) { Write-Host "--- stdout ---"; Get-Content $OutLog }
     if (Test-Path $ErrLog) { Write-Host "--- stderr ---"; Get-Content $ErrLog }
     Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+    Get-Process graphify-mcp -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
     exit 1
 }
 

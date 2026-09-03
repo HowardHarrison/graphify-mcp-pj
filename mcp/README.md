@@ -97,25 +97,24 @@ graphify-local
 
 Transport: **stdio** (Cursor starts `graphify-mcp` and loads `graph/graph.json`).
 
-Current config shape (see official Cursor MCP docs):
+Current config shape (Windows-safe via `cmd.exe` launcher):
 
 ```json
 {
   "mcpServers": {
     "graphify-local": {
       "type": "stdio",
-      "command": "${userHome}/.local/bin/graphify-mcp.exe",
+      "command": "cmd.exe",
       "args": [
-        "${workspaceFolder}/graph/graph.json",
-        "--transport",
-        "stdio"
+        "/c",
+        "${workspaceFolder}\\scripts\\run-graphify-mcp-stdio.cmd"
       ]
     }
   }
 }
 ```
 
-On macOS/Linux, change `command` to `"graphify-mcp"` (or `${userHome}/.local/bin/graphify-mcp`) after installing with `uv tool install "graphifyy[mcp]"`.
+The `.cmd` wrapper resolves Windows paths and locates `graphify-mcp` (PATH or `%USERPROFILE%\.local\bin\graphify-mcp.exe`). Direct `${userHome}/.local/...` paths can fail in Cursor on Windows with *“The filename, directory name, or volume label syntax is incorrect.”*
 
 ### Enable in Cursor
 
@@ -127,14 +126,18 @@ On macOS/Linux, change `command` to `"graphify-mcp"` (or `${userHome}/.local/bin
 
 ### PATH troubleshooting (Windows)
 
-If Cursor shows `graphify-mcp` not found, either:
+If Cursor still fails to connect:
 
-* Add `C:\Users\<YOU>\.local\bin` to your user PATH and restart Cursor, or
-* Change `command` in `.cursor/mcp.json` to the full executable path, for example:
+1. Confirm the launcher works:
 
-```json
-"command": "${userHome}/.local/bin/graphify-mcp.exe"
+```powershell
+cmd /c scripts\run-graphify-mcp-stdio.cmd
 ```
+
+(It should sit waiting on stdio; press Ctrl+C to stop.)
+
+2. Check **Output → MCP Logs** after toggling `graphify-local` off/on.
+3. Ensure `uv tool install "graphifyy[mcp]"` succeeded and `%USERPROFILE%\.local\bin\graphify-mcp.exe` exists.
 
 ### Optional HTTP config (not default)
 
