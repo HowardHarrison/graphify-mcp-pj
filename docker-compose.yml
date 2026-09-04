@@ -1,9 +1,11 @@
-# Local Graphify MCP stack (Phase 6).
-# Host binds to 127.0.0.1 only — do not publish on 0.0.0.0.
+# Local Graphify MCP stack.
+# Host binds to 127.0.0.1 by default — do not publish on 0.0.0.0.
 #
 # Usage:
 #   docker compose up -d --build
 #   docker compose down
+#
+# Configuration: copy `.env.example` to `.env` (optional).
 
 services:
   graphify-mcp:
@@ -14,29 +16,35 @@ services:
     container_name: graphify-mcp-local
     restart: unless-stopped
     ports:
-      # Host:Container — local-only on the host
-      - "127.0.0.1:8765:8080"
+      # Host bind stays local-only; container listens on 0.0.0.0 internally.
+      - "${MCP_HOST_BIND:-127.0.0.1}:${MCP_HOST_PORT:-8765}:${MCP_CONTAINER_PORT:-8080}"
     volumes:
-      # Mount generated graph; rebuild image is not required after graph updates
-      - ./graph/graph.json:/data/graph.json:ro
+      # Mount generated graph; regenerating graph.json does not require image rebuild.
+      - "${GRAPH_PATH:-./graph/graph.json}:/data/graph.json:ro"
     environment:
       GRAPH_PATH: /data/graph.json
-      MCP_HOST: 0.0.0.0
-      MCP_PORT: "8080"
-      # Optional HTTP auth for the MCP endpoint (leave unset for local-only testing)
-      # GRAPHIFY_API_KEY: ${GRAPHIFY_API_KEY:-}
+      MCP_HOST: ${MCP_CONTAINER_HOST:-0.0.0.0}
+      MCP_PORT: ${MCP_CONTAINER_PORT:-8080}
+      GRAPHIFY_API_KEY: ${GRAPHIFY_API_KEY:-}
+    command:
+      - /data/graph.json
+      - --transport
+      - http
+      - --host
+      - ${MCP_CONTAINER_HOST:-0.0.0.0}
+      - --port
+      - ${MCP_CONTAINER_PORT:-8080}
     healthcheck:
       test:
         [
           "CMD",
           "python",
           "-c",
-          "import socket; s=socket.create_connection(('127.0.0.1',8080),3); s.close()",
+          "import os,socket; p=int(os.environ.get('MCP_PORT','8080')); s=socket.create_connection(('127.0.0.1',p),3); s.close()",
         ]
       interval: 15s
       timeout: 5s
       retries: 5
       start_period: 15s
-    # Read-only root filesystem is intentionally not enabled: uvicorn needs writable temp/runtime paths.
     security_opt:
       - no-new-privileges:true

@@ -2,6 +2,7 @@
 $ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $PSScriptRoot
+$RootEnvFile = Join-Path $Root ".env"
 $EnvFile = Join-Path $Root "mcp\.env"
 $DefaultGraph = Join-Path $Root "graph\graph.json"
 $PidFile = Join-Path $Root "mcp\.mcp.pid"
@@ -17,7 +18,7 @@ function Read-DotEnv {
         if (-not $line -or $line.StartsWith("#")) { return }
         $parts = $line.Split("=", 2)
         if ($parts.Count -eq 2) {
-            $map[$parts[0].Trim()] = $parts[1].Trim()
+            $map[$parts[0].Trim()] = $parts[1].Trim().Trim('"')
         }
     }
     return $map
@@ -31,13 +32,17 @@ function Get-ListenerPid {
     return $null
 }
 
-$envMap = Read-DotEnv -Path $EnvFile
+# Root .env wins; mcp/.env can override for script-only local tweaks.
+$envMap = Read-DotEnv -Path $RootEnvFile
+$mcpEnv = Read-DotEnv -Path $EnvFile
+foreach ($key in $mcpEnv.Keys) { $envMap[$key] = $mcpEnv[$key] }
+
 $GraphPath = if ($envMap["GRAPH_PATH"]) { $envMap["GRAPH_PATH"] } else { $DefaultGraph }
 if (-not [System.IO.Path]::IsPathRooted($GraphPath)) {
-    $GraphPath = Join-Path $Root $GraphPath
+    $GraphPath = Join-Path $Root ($GraphPath -replace '^\./', '')
 }
 $HostBind = if ($envMap["MCP_HOST"]) { $envMap["MCP_HOST"] } else { "127.0.0.1" }
-$Port = if ($envMap["MCP_PORT"]) { [int]$envMap["MCP_PORT"] } else { 8765 }
+$Port = if ($envMap["MCP_PORT"]) { [int]$envMap["MCP_PORT"] } elseif ($envMap["MCP_HOST_PORT"]) { [int]$envMap["MCP_HOST_PORT"] } else { 8765 }
 
 if ($HostBind -ne "127.0.0.1" -and $HostBind -ne "localhost") {
     Write-Host "[ERROR] Refusing non-local bind host '$HostBind'. Use 127.0.0.1 for Phase 3."

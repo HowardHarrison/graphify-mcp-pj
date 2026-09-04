@@ -9,6 +9,7 @@
   "transport": {
     "preferred_for_cursor": "stdio",
     "preferred_for_manual_verify": "http",
+    "preferred_for_team_future": "http",
     "stdio_command": "graphify-mcp",
     "http": {
       "host": "127.0.0.1",
@@ -19,11 +20,28 @@
   },
   "graph": {
     "path": "graph/graph.json",
-    "viewer": "graph/graph.html"
+    "viewer": "graph/graph.html",
+    "future_multi_repo_root": "graphs/"
+  },
+  "config": {
+    "env_example": ".env.example",
+    "variables": [
+      "GRAPH_PATH",
+      "SOURCE_PATH",
+      "GRAPH_OUT_DIR",
+      "MCP_HOST",
+      "MCP_PORT",
+      "MCP_HOST_BIND",
+      "MCP_HOST_PORT",
+      "MCP_CONTAINER_HOST",
+      "MCP_CONTAINER_PORT",
+      "GRAPHIFY_API_KEY"
+    ]
   },
   "notes": [
     "Do not expose this server publicly.",
-    "Cursor uses .cursor/mcp.json (stdio). HTTP scripts remain for local verification.",
-    "Regenerate the graph with scripts/generate-graph.ps1 before serving."
+    "Cursor uses .cursor/mcp.json (stdio). Docker HTTP is for local/shared verification.",
+    "Regenerate the graph with scripts/generate-graph.ps1 before serving.",
+    "See docs/SCALING.md for multi-repo evolution without implementing it yet."
   ]
 }

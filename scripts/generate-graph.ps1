@@ -3,16 +3,37 @@
 $ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $PSScriptRoot
-$Source = Join-Path $Root "sample-app"
-$OutDir = Join-Path $Root "graph"
+$RootEnvFile = Join-Path $Root ".env"
+
+function Read-DotEnv {
+    param([string]$Path)
+    $map = @{}
+    if (-not (Test-Path $Path)) { return $map }
+    Get-Content $Path | ForEach-Object {
+        $line = $_.Trim()
+        if (-not $line -or $line.StartsWith("#")) { return }
+        $parts = $line.Split("=", 2)
+        if ($parts.Count -eq 2) {
+            $map[$parts[0].Trim()] = $parts[1].Trim().Trim('"')
+        }
+    }
+    return $map
+}
+
+$envMap = Read-DotEnv -Path $RootEnvFile
+$SourceRel = if ($envMap["SOURCE_PATH"]) { $envMap["SOURCE_PATH"] -replace '^\./', '' } else { "sample-app" }
+$OutRel = if ($envMap["GRAPH_OUT_DIR"]) { $envMap["GRAPH_OUT_DIR"] -replace '^\./', '' } else { "graph" }
+
+$Source = if ([System.IO.Path]::IsPathRooted($SourceRel)) { $SourceRel } else { Join-Path $Root $SourceRel }
+$OutDir = if ([System.IO.Path]::IsPathRooted($OutRel)) { $OutRel } else { Join-Path $Root $OutRel }
 $Canonical = Join-Path $OutDir "graph.json"
 $Viewer = Join-Path $OutDir "graph.html"
 $ExtractPath = Join-Path $OutDir "graphify-out\graph.json"
 
 Write-Host "[INFO] Generating graph"
-Write-Host "[INFO] Source: sample-app/"
-Write-Host "[INFO] Output: graph/graph.json"
-Write-Host "[INFO] Viewer: graph/graph.html"
+Write-Host "[INFO] Source: $SourceRel/"
+Write-Host "[INFO] Output: $OutRel/graph.json"
+Write-Host "[INFO] Viewer: $OutRel/graph.html"
 
 if (-not (Get-Command graphify -ErrorAction SilentlyContinue)) {
     Write-Host "[ERROR] graphify command not found. Install with: uv tool install graphifyy"
@@ -20,7 +41,7 @@ if (-not (Get-Command graphify -ErrorAction SilentlyContinue)) {
 }
 
 if (-not (Test-Path $Source -PathType Container)) {
-    Write-Host "[ERROR] Sample application not found at $Source"
+    Write-Host "[ERROR] Source application not found at $Source"
     exit 1
 }
 

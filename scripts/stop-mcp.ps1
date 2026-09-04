@@ -5,15 +5,22 @@ $Root = Split-Path -Parent $PSScriptRoot
 $PidFile = Join-Path $Root "mcp\.mcp.pid"
 $Port = 8765
 
-$EnvFile = Join-Path $Root "mcp\.env"
-if (Test-Path $EnvFile) {
-    Get-Content $EnvFile | ForEach-Object {
+function Read-PortFromEnvFile {
+    param([string]$Path, [int]$Current)
+    if (-not (Test-Path $Path)) { return $Current }
+    Get-Content $Path | ForEach-Object {
         $line = $_.Trim()
-        if ($line -and -not $line.StartsWith("#") -and $line.StartsWith("MCP_PORT=")) {
-            $Port = [int]($line.Split("=", 2)[1].Trim())
+        if (-not $line -or $line.StartsWith("#")) { return }
+        if ($line.StartsWith("MCP_PORT=") -or $line.StartsWith("MCP_HOST_PORT=")) {
+            $val = $line.Split("=", 2)[1].Trim().Trim('"')
+            if ($val) { $script:Port = [int]$val }
         }
     }
+    return $Port
 }
+
+$Port = Read-PortFromEnvFile -Path (Join-Path $Root ".env") -Current $Port
+$Port = Read-PortFromEnvFile -Path (Join-Path $Root "mcp\.env") -Current $Port
 
 function Get-ListenerPid {
     param([int]$Port)

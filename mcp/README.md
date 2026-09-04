@@ -249,6 +249,15 @@ Default project config remains stdio (`.cursor/mcp.json`). Prefer stdio for IDE-
 
 Logs may warn that the process binds `0.0.0.0` without an API key. That bind is inside the container network. The **host** publish remains `127.0.0.1:8765`. For stricter local auth, set `GRAPHIFY_API_KEY` in a root `.env` (see `.env.example`).
 
+## Future scaling (Phase 7)
+
+- Root config contract: `.env.example` (`GRAPH_PATH`, `MCP_*`, Docker bind vars)
+- Scaling plan: [`../docs/SCALING.md`](../docs/SCALING.md)
+- Future multi-graph folder: [`../graphs/README.md`](../graphs/README.md)
+- Verification checklist: [`../docs/VERIFICATION.md`](../docs/VERIFICATION.md)
+
+Default active graph remains `graph/graph.json`. Do not implement full multi-repo merge/serve here yet.
+
 ## Security
 
 - Bind host ports to `127.0.0.1` only
