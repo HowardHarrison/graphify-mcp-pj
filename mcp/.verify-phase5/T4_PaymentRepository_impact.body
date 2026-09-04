@@ -1,3 +1,0 @@
-event: message
-data: {"jsonrpc":"2.0","id":13,"result":{"content":[{"text":"Neighbors of PaymentRepository:\n  --> .findById() [method] [EXTRACTED] at=src/payment/payment.repository.ts:L12\n  --> .save() [method] [EXTRACTED] at=src/payment/payment.repository.ts:L21\n  <-- index.ts [imports] [EXTRACTED] at=src/index.ts:L9\n  <-- payment.service.ts [imports] [EXTRACTED] at=src/payment/payment.service.ts:L6\n  <-- .constructor() [references] [EXTRACTED] at=src/payment/payment.service.ts:L23\n  <-- payment.repository.ts [contains] [EXTRACTED] at=src/payment/payment.repository.ts:L6","type":"text"}],"isError":false}}
-

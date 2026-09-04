@@ -13,6 +13,7 @@ mcp/.mcp.pid
 mcp/.mcp.out.log
 mcp/.mcp.err.log
 mcp/.verify/
+mcp/.verify-phase5/
 mcp/_*.json
 mcp/_*.body
 mcp/_*.headers

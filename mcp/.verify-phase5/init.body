@@ -1,3 +1,0 @@
-event: message
-data: {"jsonrpc":"2.0","id":1,"result":{"capabilities":{"experimental":{},"resources":{"listChanged":false,"subscribe":false},"tools":{"listChanged":false}},"protocolVersion":"2024-11-05","serverInfo":{"name":"graphify","version":"0.9.53"}}}
-

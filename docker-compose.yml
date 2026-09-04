@@ -1,0 +1,42 @@
+# Local Graphify MCP stack (Phase 6).
+# Host binds to 127.0.0.1 only — do not publish on 0.0.0.0.
+#
+# Usage:
+#   docker compose up -d --build
+#   docker compose down
+
+services:
+  graphify-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: graphify-mcp-local:0.9.53
+    container_name: graphify-mcp-local
+    restart: unless-stopped
+    ports:
+      # Host:Container — local-only on the host
+      - "127.0.0.1:8765:8080"
+    volumes:
+      # Mount generated graph; rebuild image is not required after graph updates
+      - ./graph/graph.json:/data/graph.json:ro
+    environment:
+      GRAPH_PATH: /data/graph.json
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "8080"
+      # Optional HTTP auth for the MCP endpoint (leave unset for local-only testing)
+      # GRAPHIFY_API_KEY: ${GRAPHIFY_API_KEY:-}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import socket; s=socket.create_connection(('127.0.0.1',8080),3); s.close()",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    # Read-only root filesystem is intentionally not enabled: uvicorn needs writable temp/runtime paths.
+    security_opt:
+      - no-new-privileges:true

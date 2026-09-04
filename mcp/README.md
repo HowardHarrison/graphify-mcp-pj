@@ -190,9 +190,69 @@ powershell -File scripts/start-mcp.ps1
 powershell -File scripts/test-mcp-queries.ps1
 ```
 
+## Docker (Phase 6)
+
+Run Graphify MCP in Docker Compose. The graph file is **mounted read-only**; regenerating `graph/graph.json` does not require rebuilding the image.
+
+### Start
+
+```powershell
+docker compose up -d --build
+```
+
+### Stop
+
+```powershell
+docker compose down
+```
+
+### Exposed port
+
+| Where | Address | Notes |
+|-------|---------|-------|
+| Host (local only) | `127.0.0.1:8765` → container `8080` | Do not publish on `0.0.0.0` |
+| MCP URL | `http://127.0.0.1:8765/mcp` | Same endpoint as local HTTP scripts |
+| Inside container | `0.0.0.0:8080` | Required for Docker port publishing |
+
+Mount:
+
+```text
+./graph/graph.json  →  /data/graph.json  (read-only)
+```
+
+Container runs as non-root user `graphify` (uid 10001).
+
+### Verify against Docker
+
+```powershell
+powershell -File scripts/test-mcp.ps1
+powershell -File scripts/test-mcp-queries.ps1
+```
+
+### Optional Cursor HTTP config
+
+While Docker is running, Cursor can use:
+
+```json
+{
+  "mcpServers": {
+    "graphify-local": {
+      "url": "http://127.0.0.1:8765/mcp"
+    }
+  }
+}
+```
+
+Default project config remains stdio (`.cursor/mcp.json`). Prefer stdio for IDE-managed local use; prefer Docker HTTP for shared/local container verification.
+
+### Note about container bind warning
+
+Logs may warn that the process binds `0.0.0.0` without an API key. That bind is inside the container network. The **host** publish remains `127.0.0.1:8765`. For stricter local auth, set `GRAPHIFY_API_KEY` in a root `.env` (see `.env.example`).
+
 ## Security
 
-- Bind to `127.0.0.1` only
-- Do not use `0.0.0.0` for local testing
+- Bind host ports to `127.0.0.1` only
+- Do not publish MCP on `0.0.0.0` on the host
 - Do not commit secrets
 - MCP server is read-only over the code graph
+- Docker mounts `graph.json` read-only

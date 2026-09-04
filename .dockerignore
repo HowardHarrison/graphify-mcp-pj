@@ -1,0 +1,16 @@
+.git
+.gitignore
+.cursor
+.env
+**/.venv
+**/node_modules
+**/__pycache__
+**/graphify-out
+mcp/.verify
+mcp/.verify-phase5
+mcp/.mcp.pid
+mcp/.mcp.*.log
+*.log
+AGENTS.md
+sample-app
+scripts
